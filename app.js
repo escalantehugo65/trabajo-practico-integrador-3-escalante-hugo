@@ -1,13 +1,15 @@
 import express from 'express';
 import "dotenv/config";
 import { StartDB } from './src/config/db.js';
+import cookieParser from 'cookie-parser';
+import cors from "cors"
 
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 
 
-app.use(express.json())
+app.use(express.json(), cors(), cookieParser());
 
 await StartDB();
 
