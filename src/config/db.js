@@ -1,17 +1,14 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 import "dotenv/config";
 
+export const StartDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
 
-export const StartDB = async()=>{
+    console.log("Se ha conectado con éxito a la Base de Datos");
+  } catch (error) {
+    console.error("No se ha podido conectar a la Base de Datos");
 
-    try{
-
-        await mongoose.connect(process.env.MONGODB_URL)
-
-        console.log("Se ha conectado con éxito a la Base de Datos")
-    }catch(error){
-        console.error("No se ha podido conectar a la Base de Datos")
-
-        throw error;
-    }
-}
+    throw error;
+  }
+};
