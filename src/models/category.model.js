@@ -1,31 +1,36 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from "mongoose";
 
 const categorySchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, 'El nombre de la categoría es obligatorio'],
+      required: true,
       unique: true,
-      minLength: [2, 'Mínimo 2 caracteres'],
-      maxLength: [30, 'Máximo 30 caracteres']
+      trim: true,
+      lowercase: true,
+      minlength: 2,
+      maxlength: 30,
     },
+
     description: {
       type: String,
-      maxLength: [200, 'Máximo 200 caracteres']
-    }
+      trim: true,
+      maxlength: 200,
+    },
   },
-  {
-    timestamps: true,
-    versionKey: false,
-    toJSON: { virtuals: true }, 
-    toObject: { virtuals: true }
-  }
+  { timestamps: true, versionKey: false },
 );
 
-categorySchema.virtual('events', {
-  ref: 'Event',
-  localField: '_id',
-  foreignField: 'categories' 
+categorySchema.virtual("events", {
+  ref: "Event",
+
+  localField: "_id",
+
+  foreignField: "categories",
 });
 
-export const Category = model('Category', categorySchema);
+categorySchema.set("toJSON", { virtuals: true });
+
+categorySchema.set("toObject", { virtuals: true });
+
+export const Category = model("Category", categorySchema);

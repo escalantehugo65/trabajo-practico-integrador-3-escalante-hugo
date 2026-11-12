@@ -1,82 +1,109 @@
-import { Schema, model } from 'mongoose';
-
+import { Schema, model } from "mongoose";
 
 const profileSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: [true, 'El nombre es obligatorio'],
+      required: true,
       trim: true,
-      minLength: [2, 'Mínimo 2 caracteres'],
-      maxLength: [50, 'Máximo 50 caracteres']
+      minlength: 2,
+      maxlength: 50,
     },
+
     lastName: {
       type: String,
-      required: [true, 'El apellido es obligatorio'],
+      required: true,
       trim: true,
-      minLength: [2, 'Mínimo 2 caracteres'],
-      maxLength: [50, 'Máximo 50 caracteres']
+      minlength: 2,
+      maxlength: 50,
     },
+
     birthDate: {
       type: Date,
-      default: null
+      validate: {
+        validator: (date) => !date || date.getTime() <= Date.now(),
+        message: "La fecha de nacimiento no puede ser futura",
+      },
     },
+
     phone: {
       type: String,
-      default: null
-    }
+      minlength: 8,
+      maxlength: 15,
+    },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const userSchema = new Schema(
   {
     username: {
       type: String,
-      required: [true, 'El nombre de usuario es obligatorio'],
+      required: true,
       unique: true,
       trim: true,
-      minLength: [3, 'El username debe tener entre 3 y 20 caracteres'],
-      maxLength: [20, 'El username debe tener entre 3 y 20 caracteres']
+      lowercase: true,
+      minlength: 3,
+      maxlength: 20,
     },
+
     email: {
       type: String,
-      required: [true, 'El email es obligatorio'],
+      required: true,
       unique: true,
       trim: true,
-      lowercase: true
+      lowercase: true,
     },
+
     password: {
       type: String,
-      required: [true, 'La contraseña es obligatoria']
+      required: true,
+      select: false,
     },
+
     role: {
       type: String,
-      enum: ['user', 'admin'],
-      default: 'user'
+      enum: ["user", "admin"],
+      default: "user",
     },
+
     profile: {
       type: profileSchema,
-      required: true
+      required: true,
     },
+
     deletedAt: {
       type: Date,
-      default: null
-    }
+      default: null,
+    },
   },
-  {
-    timestamps: true,
-    versionKey: false,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true }
-  }
+  { timestamps: true, versionKey: false },
 );
 
+userSchema.virtual("events", {
+  ref: "Event",
 
-userSchema.virtual('events', {
-  ref: 'Event',
-  localField: '_id',
-  foreignField: 'organizer'
+  localField: "_id",
+
+  foreignField: "organizer",
 });
 
-export const User = model('User', userSchema);
+userSchema.set("toJSON", {
+  virtuals: true,
+
+  transform: (_document, user) => {
+    delete user.password;
+    return user;
+  },
+});
+
+userSchema.set("toObject", {
+  virtuals: true,
+
+  transform: (_document, user) => {
+    delete user.password;
+    return user;
+  },
+});
+
+export const User = model("User", userSchema);
